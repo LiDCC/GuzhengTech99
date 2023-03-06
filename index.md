@@ -17,12 +17,14 @@ Instrument playing technique (IPT) is a key element of musical presentation. How
 <div style="text-align: center;">
     <img src="./img/performer_sta.png" width="300px">
 </div>
-Statistics of the IPT labels in each data split. upper: counts, lower: total duration.
+Statistics of the performers in each data split. upper: counts, lower: total duration.
+
+---------------------------------------------------------------------------------------------
 
 <div style="text-align: center;">
     <img src="./img/IPT_sta.png" width="300px">
 </div>
-Statistics of the performers in each data split. upper: counts, lower: total duration.
+Statistics of the IPT labels in each data split. upper: counts, lower: total duration.
 
 ### Description
 

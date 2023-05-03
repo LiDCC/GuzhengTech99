@@ -13,7 +13,7 @@ Instrument playing technique (IPT) is a key element of musical presentation. How
  - The dataset is split into 79, 10, 10 songs respectively for the training set, the validation set, and the test set. 
  - When splitting, we control the distribution of IPT types and performers in the three sets to be as similar as possible.
 <div style="text-align: center;">
-    <img src="./img/performer_sta.png" width="300px">
+    <img src="./img/Performer_sta.png" width="300px">
 </div>
 Statistics of the performers in each data split. upper: counts, lower: total duration.
 

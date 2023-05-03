@@ -26,3 +26,14 @@ python run.py
 ```
 python test_frame.py
 ```
+
+## Citation
+```
+@inproceedings{li2023frame,
+  title={Frame-Level Multi-Label Playing Technique Detection Using Multi-Scale Network and Self-Attention Mechanism},
+  author={Li, Dichucheng and Che, Mingjin and Meng, Wenwu and Wu, Yulun and Yu, Yi and Xia, Fan and Li, Wei},
+  booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing, ICASSP},
+  year={2023},
+  organization={IEEE}
+}
+```

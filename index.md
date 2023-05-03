@@ -1,8 +1,8 @@
 # Frame-Level Multi-Label Playing Technique Detection Using Multi-Scale Network and Self-Attention Mechanism
 ## Dichucheng Li, Mingjin Che, Wenwu Meng, Yulun Wu, Yi Yu, Fan Xia, Wei Li
 
-[database](https://ccmusic-database.github.io/en/database/csmtd.html#Tech99)
-[code](https://github.com/LiDCC/GuzhengTech99)
+[database](https://ccmusic-database.github.io/en/database/csmtd.html#Tech99) \\
+[code](https://github.com/LiDCC/GuzhengTech99) \\
 [paper on Arxiv](https://arxiv.org/pdf/2303.13272.pdf)
 ### Abstract of the paper
 
@@ -10,6 +10,8 @@ Instrument playing technique (IPT) is a key element of musical presentation. How
 
 
 ### Statistics of the data splits.
+ - The dataset is split into 79, 10, 10 songs respectively for the training set, the validation set, and the test set. 
+ - When splitting, we control the distribution of IPT types and performers in the three sets to be as similar as possible.
 <div style="text-align: center;">
     <img src="./img/performer_sta.png" width="300px">
 </div>
@@ -23,6 +25,6 @@ Statistics of the performers in each data split. upper: counts, lower: total dur
 Statistics of the IPT labels in each data split. upper: counts, lower: total duration.
 
 ### Metadata
-It contains songlist. it contains following information;
+It contains songlist. It contains following information:
 
 <iframe width="1000" height="500" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRFogTkRxz7V736qZ0Bg243kQFa3Jy5NapjypwMfRlg0LpMq7ma4ehmJ-G-cH7Ny_h9PJDKK88u7W2h/pubhtml?widget=true&amp;headers=false"></iframe>

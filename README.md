@@ -15,7 +15,7 @@ Dichucheng Li, Mingjin Che, Wenwu Meng, Yulun Wu, Yi Yu, Fan Xia and Wei Li ["Fr
 - **run.py**: start the training process
 - **test_frame.py**: start the evaluation process
 
-## Process
+## Training & Test Process
 - Download Guzheng_Tech99 dataset (https://ccmusic-database.github.io/en/database/csmtd.html#Tech99)
 - create a new folder "/data/model" to store Model's parameters during training process
 - Train the model:

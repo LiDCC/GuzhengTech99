@@ -1,4 +1,5 @@
 # GuzhengTech99_ICASSP2023
+[![pages-build-deployment](https://github.com/LiDCC/GuzhengTech99/actions/workflows/pages/pages-build-deployment/badge.svg?branch=main)](https://github.com/LiDCC/GuzhengTech99/actions/workflows/pages/pages-build-deployment)
 
 ## Paper:
 Dichucheng Li, Mingjin Che, Wenwu Meng, Yulun Wu, Yi Yu, Fan Xia and Wei Li ["Frame-Level Multi-Label Playing Technique Detection Using Multi-Scale Network and Self-Attention Mechanism"](https://arxiv.org/pdf/2303.13272.pdf), IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP 2023)

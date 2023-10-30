@@ -6,18 +6,20 @@ import sys
 import csv
 import librosa
 from tqdm import tqdm
-from norm_lib import *
-from config import *
+from function.norm_lib import *
+from function.config import *
 import torch
 
+
 def norm(avg, std, data, size):
-    avg = np.tile(avg.reshape((1,-1,1,1)),(size[0],1,size[2],size[3]))
-    std = np.tile(std.reshape((1,-1,1,1)),(size[0],1,size[2],size[3]))
+    avg = np.tile(avg.reshape((1, -1, 1, 1)), (size[0], 1, size[2], size[3]))
+    std = np.tile(std.reshape((1, -1, 1, 1)), (size[0], 1, size[2], size[3]))
     data = (data - avg)/std
     return data
 
+
 def load(wav_dir, csv_dir, groups, avg=None, std=None):
-    #Return all [(audio address, corresponding to csv file address), ( , ), ...] list
+    # Return all [(audio address, corresponding to csv file address), ( , ), ...] list
     if std is None:
         std = np.array([None])
     if avg is None:
@@ -37,11 +39,13 @@ def load(wav_dir, csv_dir, groups, avg=None, std=None):
             result.append((audio_path, csv_path))
         return result
 
-    #Returns the CQT of the input audio
+    # Returns the CQT of the input audio
     def logCQT(file):
         sr = SAMPLE_RATE
         y, sr = librosa.load(file, sr=sr)
-        cqt = librosa.cqt(y, sr=sr, hop_length=HOP_LENGTH, fmin=27.5, n_bins=88, bins_per_octave=12) #帧长为32ms（1000ms/(16000/512) = 32ms）,D2的频率是73.418
+        # 帧长为32ms（1000ms/(16000/512) = 32ms）,D2的频率是73.418
+        cqt = librosa.cqt(y, sr=sr, hop_length=HOP_LENGTH,
+                          fmin=27.5, n_bins=88, bins_per_octave=12)
         return ((1.0/80.0) * librosa.core.amplitude_to_db(np.abs(cqt), ref=np.max)) + 1.0
 
     def chunk_data(f):
@@ -60,19 +64,22 @@ def load(wav_dir, csv_dir, groups, avg=None, std=None):
 
     def load_all(audio_path, csv_path):
 
-        saved_data_path = audio_path.replace('.flac', '.pt').replace('.wav', '.pt')
+        saved_data_path = audio_path.replace(
+            '.flac', '.pt').replace('.wav', '.pt')
         if os.path.exists(saved_data_path):
             return torch.load(saved_data_path)
 
-        #Load audio features
-        cqt = logCQT(audio_path) #The shape of cqt (88, 8520), 8520 is the number of frames on the time axis
+        # Load audio features
+        # The shape of cqt (88, 8520), 8520 is the number of frames on the time axis
+        cqt = logCQT(audio_path)
 
-        #Load the ground truth label
+        # Load the ground truth label
         hop = HOP_LENGTH
         n_steps = cqt.shape[1]
         n_IPTs = NUM_LABELS
 
-        technique = {'chanyin': 0, 'dianyin': 6, 'shanghua': 2, 'xiahua': 3, 'huazhi':4, 'guazou': 4, 'lianmo': 4, 'liantuo': 4, 'yaozhi': 5, 'boxian': 1}
+        technique = {'chanyin': 0, 'dianyin': 6, 'shanghua': 2, 'xiahua': 3,
+                     'huazhi': 4, 'guazou': 4, 'lianmo': 4, 'liantuo': 4, 'yaozhi': 5, 'boxian': 1}
 
         IPT_label = np.zeros([n_IPTs, n_steps], dtype=int)
 
@@ -88,7 +95,8 @@ def load(wav_dir, csv_dir, groups, avg=None, std=None):
                 frame_right = min(n_steps, frame_right)
                 IPT_label[IPT, left:frame_right] = 1
 
-        data = dict(audiuo_path=audio_path, csv_path=csv_path, cqt=cqt, IPT_label=IPT_label)
+        data = dict(audiuo_path=audio_path, csv_path=csv_path,
+                    cqt=cqt, IPT_label=IPT_label)
         torch.save(data, saved_data_path)
         return data
 
@@ -109,13 +117,13 @@ def load(wav_dir, csv_dir, groups, avg=None, std=None):
             Ytr_i = y_i
             i += 1
         else:
-            Xtr = np.concatenate([Xtr,x],axis=0)
-            Ytr_i = np.concatenate([Ytr_i,y_i],axis=0)
+            Xtr = np.concatenate([Xtr, x], axis=0)
+            Ytr_i = np.concatenate([Ytr_i, y_i], axis=0)
 
-    #Transform the shape of the input
+    # Transform the shape of the input
     Xtr = np.expand_dims(Xtr, axis=3)
 
-    #Calculate the mean and variance of the input
+    # Calculate the mean and variance of the input
     if avg.all() == None and std.all() == None:
         avg, std = RoW_norm(Xtr, './data/%s%d_avg_std' % ('inst', 5))
         print("avg.shape:", avg.shape)

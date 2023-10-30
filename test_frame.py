@@ -1,62 +1,64 @@
+# from sklearn.metrics import f1_score, precision_score, recall_score
+from mlcm import mlcm
+import sklearn.metrics as skm
+import numpy as np
+# from sklearn.metrics import precision_score
+from function.load_data import *
+from function.lib import *
+from function.model import *
+import datetime
+import matplotlib.pyplot as plt
 import sys
-import torch.optim as optim
+# import torch.optim as optim
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import datetime
-from sklearn.metrics import f1_score,precision_score,recall_score
 date = datetime.datetime.now()
 
 sys.path.append('./function')
-from function.model import *
 # from audioset import *
-from function.lib import *
-from function.load_data import *
-from sklearn.metrics import precision_score
-import numpy as np
-import sklearn.metrics as skm
-from mlcm import mlcm
+
 
 def start_test():
 
-    #load model
+    # load model
     model = SY_multi_scale_attn222().to(device)
-    save_dic = torch.load('data/model/20229269:30:30最终模型/baseline/_e_860',map_location= 'cpu') #860
+    save_dic = torch.load(
+        'data/model/20229269-30-30_final_model/baseline/_e_860', map_location='cpu')  # 860
     model.load_state_dict(save_dic['state_dict'])
-    print ('finishing loading model')
+    print('finishing loading model')
 
     Xavg, Xstd = save_dic['avg'], save_dic['std']
     wav_dir = 'Guzheng_TechPitch/data'
     csv_dir = 'Guzheng_TechPitch/labels'
     test_group = ['test']
-    Xte, Yte, _, _ = load(wav_dir,csv_dir,test_group,Xavg.data.cpu().numpy(),Xstd.data.cpu().numpy())
-    print ('finishing loading dataset')
+    Xte, Yte, _, _ = load(wav_dir, csv_dir, test_group,
+                          Xavg.data.cpu().numpy(), Xstd.data.cpu().numpy())
+    print('finishing loading dataset')
 
-    #predict configure
+    # predict configure
     v_kwargs = {'batch_size': 8, 'num_workers': 10, 'pin_memory': True}
     loader = torch.utils.data.DataLoader(Data2Torch([Xte, Yte]), **v_kwargs)
-    all_pred = np.zeros((Yte.shape[0],NUM_LABELS,Yte.shape[2]))
-    all_tar = np.zeros((Yte.shape[0],NUM_LABELS,Yte.shape[2]))
+    all_pred = np.zeros((Yte.shape[0], NUM_LABELS, Yte.shape[2]))
+    all_tar = np.zeros((Yte.shape[0], NUM_LABELS, Yte.shape[2]))
 
-    #start predict
-    print ('start predicting...')
+    # start predict
+    print('start predicting...')
     model.eval()
     ds = 0
-    for idx,_input in enumerate(loader):
-        data, target = Variable(_input[0].to(device)), Variable(_input[1].to(device))
+    for idx, _input in enumerate(loader):
+        data, target = Variable(_input[0].to(
+            device)), Variable(_input[1].to(device))
         f_pred = model(data, Xavg, Xstd)
         all_tar[ds: ds + len(target)] = target.data.cpu().numpy()
-        all_pred[ds: ds + len(target)] = F.sigmoid(torch.squeeze(f_pred)).data.cpu().numpy() #最终开主食
+        all_pred[ds: ds + len(target)] = F.sigmoid(torch.squeeze(f_pred)
+                                                   ).data.cpu().numpy()  # 最终开主食
         ds += len(target)
-
 
     threshold = 0.5
     pred_IPT = np.transpose(all_pred, (1, 0, 2)).reshape((NUM_LABELS, -1))
     pred_IPT[pred_IPT > threshold] = 1
     pred_IPT[pred_IPT <= threshold] = 0
     target_IPT = np.transpose(all_tar, (1, 0, 2)).reshape((NUM_LABELS, -1))
-
-
 
     # compute metrics
     # metrics = compute_metrics(pred_IPT, target_IPT)
@@ -109,8 +111,7 @@ def start_test():
     # print("PN_frame_f1:", metrics6['metric/IPT_frame/f1'])
     # print("PN_frame_accuracy:", metrics6['metric/IPT_frame/accuracy'])
 
-
-    #save
+    # save
     name = 'firsttryXXXX'
     np.save('output_data/IPT/' + name[:-4] + '.npy', pred_IPT)
     np.save('output_data/Yte/' + name[:-4] + '.npy', Yte)
@@ -118,11 +119,11 @@ def start_test():
     np.save('output_data/Xte/' + name[:-4] + '.npy', Xte)
 
     # confusion matrix
-    label_true = target_IPT.transpose(-1,-2)
+    label_true = target_IPT.transpose(-1, -2)
     label_pred = pred_IPT.transpose(-1, -2)
     conf_mat, normal_conf_mat = mlcm.cm(label_true, label_pred)
 
-    #compute float normal_conf_mat
+    # compute float normal_conf_mat
     divide = conf_mat.sum(axis=1, dtype='int64')
     for indx in range(len(divide)):
         if divide[indx] == 0:  # To avoid division by zero
@@ -141,11 +142,14 @@ def start_test():
     print(mcm)
     print(skm.classification_report(label_true, label_pred, digits=4))
 
-    #draw confusion matrix
-    labels_name = ["vibrato", "plucks", "UP", "DP", "glissando", "tremolo", "PN", "NTL"]
-    pred_name = ["vibrato", "plucks", "UP", "DP", "glissando", "tremolo", "PN", "NPL"]
+    # draw confusion matrix
+    labels_name = ["vibrato", "plucks", "UP",
+                   "DP", "glissando", "tremolo", "PN", "NTL"]
+    pred_name = ["vibrato", "plucks", "UP", "DP",
+                 "glissando", "tremolo", "PN", "NPL"]
     plt.figure(figsize=(8, 5))
-    plt.imshow(normal_conf_mat2, cmap=plt.cm.Blues, aspect=0.3)  # Only draw the color grid without values
+    # Only draw the color grid without values
+    plt.imshow(normal_conf_mat2, cmap=plt.cm.Blues, aspect=0.3)
     # plt.title("Normalized confusion matrix")  # title
     plt.xlabel("Prediction")
     plt.ylabel("Label")
@@ -154,21 +158,26 @@ def start_test():
 
     for x in range(8):
         for y in range(8):
-            value = float(format('%.2f' % normal_conf_mat2[y, x]))  # numerical processing
+            # numerical processing
+            value = float(format('%.2f' % normal_conf_mat2[y, x]))
             if x == y:
-                if x == 6 or x==3:
-                    plt.text(x, y, value, verticalalignment='center', horizontalalignment='center')  # write value
+                if x == 6 or x == 3:
+                    plt.text(x, y, value, verticalalignment='center',
+                             horizontalalignment='center')  # write value
                 else:
-                    plt.text(x, y, value, verticalalignment='center', horizontalalignment='center', color='white')  # write value
+                    plt.text(x, y, value, verticalalignment='center',
+                             horizontalalignment='center', color='white')  # write value
             else:
-                plt.text(x, y, value, verticalalignment='center', horizontalalignment='center')  # write value
+                plt.text(x, y, value, verticalalignment='center',
+                         horizontalalignment='center')  # write value
 
-    plt.tight_layout()  # Automatically adjust subplot parameters so that it fills the entire image area
+    # Automatically adjust subplot parameters so that it fills the entire image area
+    plt.tight_layout()
 
     plt.colorbar()  # color bar
-    plt.savefig('./ConfusionMatrix.png', bbox_inches='tight')  # bbox_inches='tight', it can ensure that the label information is fully displayed
+    # bbox_inches='tight', it can ensure that the label information is fully displayed
+    plt.savefig('./ConfusionMatrix.png', bbox_inches='tight')
     plt.show()
 
 
 start_test()
-	

@@ -6,7 +6,7 @@ import sys
 import numpy as np
 sys.path.append('../fun')
 import math
-from config import *
+from function.config import *
 
 class block(nn.Module):
     def __init__(self, inp, out):
@@ -160,5 +160,5 @@ class SY_multi_scale_attn222(nn.Module):
         x51 = self.relu51(self.bn51(self.block51(self.conv51(x51_n))))
 
         pred = self.conv4(x51)
-        print(pred.shape)
+        # print(pred.shape)
         return pred

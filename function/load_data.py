@@ -1,8 +1,6 @@
 import numpy as np
 from glob import glob
 import os
-import time
-import sys
 import csv
 import librosa
 from tqdm import tqdm

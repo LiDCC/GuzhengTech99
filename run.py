@@ -29,10 +29,9 @@ if __name__ == "__main__":
     wav_dir = 'Guzheng_TechPitch/data'
     csv_dir = 'Guzheng_TechPitch/labels'
 
-    trainset = load_dataset(
-        'H:/workspace/huggingface/Guzheng_Tech99/Guzheng_Tech99.py', split='train')
+    trainset = load_dataset('ccmusic-database/Guzheng_Tech99', split='train')
     validset = load_dataset(
-        'H:/workspace/huggingface/Guzheng_Tech99/Guzheng_Tech99.py', split='validation')
+        'ccmusic-database/Guzheng_Tech99', split='validation')
 
     Xtr, Ytr, Xva, Yva = [], [], [], []
 

@@ -1,11 +1,10 @@
 import os
 from function.config import *
-from function.load_data import *
 from function.model import *
 from function.fit import *
 from function.lib import *
 import sys
-# import torch.optim as optim
+from datasets import load_dataset
 import datetime
 date = datetime.datetime.now()
 sys.path.append('./function')
@@ -29,10 +28,26 @@ if __name__ == "__main__":
     # load data
     wav_dir = 'Guzheng_TechPitch/data'
     csv_dir = 'Guzheng_TechPitch/labels'
-    groups = ['train']
-    vali_groups = ['validation']
-    Xtr, Ytr, avg, std = load(wav_dir, csv_dir, groups)
-    Xva, Yva, va_avg, va_std = load(wav_dir, csv_dir, vali_groups, avg, std)
+
+    trainset = load_dataset(
+        'H:/workspace/huggingface/Guzheng_Tech99/Guzheng_Tech99.py', split='train')
+    validset = load_dataset(
+        'H:/workspace/huggingface/Guzheng_Tech99/Guzheng_Tech99.py', split='validation')
+
+    Xtr, Ytr, Xva, Yva = [], [], [], []
+
+    for item in trainset:
+        Xtr.append(item['data'])
+        Ytr.append(item['label'])
+
+    for item in validset:
+        Xva.append(item['data'])
+        Yva.append(item['label'])
+
+    Xtr = np.array(Xtr)
+    Ytr = np.array(Ytr)
+    Xva = np.array(Xva)
+    Yva = np.array(Yva)
     print('finishing data loading...')
 
     # Build Dataloader
@@ -58,6 +73,6 @@ if __name__ == "__main__":
     inverse_feq = get_weight(Ytr.transpose(0, 2, 1))
 
     # Start training
-    Trer = Trainer(model, 0.01, 10000, out_model_fn, avg, std,
+    Trer = Trainer(model, 0.01, 10000, out_model_fn,
                    validation_interval=5, save_interval=10)
     Trer.fit(tr_loader, va_loader, inverse_feq)

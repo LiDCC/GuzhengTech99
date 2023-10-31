@@ -14,18 +14,13 @@ from visdom import Visdom
 
 
 class Trainer:
-    def __init__(self, model, lr, epoch, save_fn, avg, std, validation_interval, save_interval):
+    def __init__(self, model, lr, epoch, save_fn, validation_interval, save_interval):
         self.epoch = epoch
         self.model = model
         self.lr = lr
         self.save_fn = save_fn
         self.validation_interval = validation_interval
         self.save_interval = save_interval
-
-        Xavg = torch.from_numpy(avg)
-        Xstd = torch.from_numpy(std)
-        self.Xavg, self.Xstd = Variable(
-            Xavg.to(device)), Variable(Xstd.to(device))
 
     def Tester(self, loader, b_size, we):
 
@@ -35,10 +30,10 @@ class Trainer:
 
         self.model.eval()
         ds = 0
-        for idx, _input in enumerate(loader):
+        for _, _input in enumerate(loader):
             data, target = Variable(_input[0].to(
                 device)), Variable(_input[1].to(device))
-            frame_pred = self.model(data, self.Xavg, self.Xstd)
+            frame_pred = self.model(data)
 
             loss = sp_loss(frame_pred, target, we)
             loss_IPT += loss.data
@@ -98,7 +93,7 @@ class Trainer:
                     device)), Variable(_input[1].to(device))
 
                 # start feed in
-                frame_pred = self.model(data, self.Xavg, self.Xstd)
+                frame_pred = self.model(data)
 
                 # counting loss
                 loss = sp_loss(frame_pred, target, we)
@@ -137,12 +132,8 @@ class Trainer:
                 if eva_result[3] > best_acc:
                     best_acc = eva_result[3]
                     save_dict['state_dict'] = self.model.state_dict()
-                    save_dict['avg'] = self.Xavg
-                    save_dict['std'] = self.Xstd
                     torch.save(save_dict, self.save_fn + 'best')
 
             if e % self.save_interval == 1:
                 save_dict['state_dict'] = self.model.state_dict()
-                save_dict['avg'] = self.Xavg
-                save_dict['std'] = self.Xstd
                 torch.save(save_dict, self.save_fn+'_e_%d' % (e-1))

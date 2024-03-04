@@ -21,6 +21,7 @@ https://lidcc.github.io/GuzhengTech99/
 
 ## Training & Test Process
 - Download Guzheng_Tech99 dataset (https://ccmusic-database.github.io/en/database/csmtd.html#Tech99)
+  you can also download here: https://huggingface.co/datasets/ccmusic-database/Guzheng_Tech99
 - Create a new folder "/data/model" to store Model's parameters during training process
 - Train the model:
 ```
